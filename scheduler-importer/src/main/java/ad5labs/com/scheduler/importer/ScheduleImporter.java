@@ -20,15 +20,18 @@ import java.util.Map;
 public class ScheduleImporter {
 
     public static void main(String[] args) throws IOException {
+    	
         String readPath = "./working-files/scheduleimport.xlsx";
         String savePath = "./working-files/schedule.txt";
         
         //read excel schedule report and turn into a .txt file
         Map schedule = ScheduleRead.openExcel(readPath);
-        ScheduleRead.writeMaptoFile(schedule, savePath);
+        System.out.println(schedule);
+        //ScheduleRead.writeMaptoFile(schedule, savePath);
         
         //read text file created previously and write data to json file
-        TxtToJSON.readFile(savePath);
+        //TxtToJSON.readFile(savePath);
+        
     }
 
 }

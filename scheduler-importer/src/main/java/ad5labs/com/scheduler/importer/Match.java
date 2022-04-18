@@ -39,4 +39,12 @@ public class Match{
         return this.obj.toString();
     }
     
+    public String get(String key) {
+    	if (obj.get(key) == null) {
+    		return "null";
+    	} else {
+    		return obj.get(key).toString();
+    	}
+    }
+    
 }
