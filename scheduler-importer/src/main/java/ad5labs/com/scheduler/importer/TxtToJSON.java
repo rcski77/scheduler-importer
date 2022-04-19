@@ -56,13 +56,14 @@ public class TxtToJSON {
                     if (minutes == 60) {
                         minutes = 0;
                         hour++;
-                        if (hour == 13) {
-                            hour = 1;
-                            if ("AM".equals(AmPm)) {
+                        if (hour == 12) {
+                        	if ("AM".equals(AmPm)) {
                                 AmPm = "PM";
                             } else {
                                 AmPm = "AM";
                             }
+                        } else if (hour == 13) {
+                            hour = 1;
                         }
                     }
                     //set new time
