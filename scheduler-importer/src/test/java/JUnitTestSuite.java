@@ -3,7 +3,7 @@ import org.junit.runner.RunWith;
 import org.junit.platform.runner.JUnitPlatform;
 
 @RunWith(JUnitPlatform.class)
-@SelectClasses({MatchTest.class, ScheduleReadTest.class, TxtToJSONTest.class})
+@SelectClasses({MatchTest.class, ScheduleReadTest.class, TxtToJSONTest.class, ScheduleImporterTest.class})
 
 public class JUnitTestSuite {
 

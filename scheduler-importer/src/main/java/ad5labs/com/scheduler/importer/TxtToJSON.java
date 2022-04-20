@@ -36,50 +36,52 @@ public class TxtToJSON {
 
         try {
             File file = new File(filePath);
-            Scanner scanner = new Scanner(file);
-            String lastLine = "";
-            
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
+            try (Scanner scanner = new Scanner(file)) {
+				String lastLine = "";
+				
+				while (scanner.hasNextLine()) {
+				    String line = scanner.nextLine();
 
-                //find first relevant line in file
-                if (line.matches(".*8:00 AM.*")) {
-                    flag = true;
-                    courtLine(lastLine);
-                }
+				    //find first relevant line in file
+				    if (line.matches(".*8:00 AM.*")) {
+				        flag = true;
+				        courtLine(lastLine);
+				    }
 
-                //convert lines to Match objects
-                if (flag) {
-                    lineToMatch(line, time);
-                    //increment time
-                    minutes += 5;
-                    if (minutes == 60) {
-                        minutes = 0;
-                        hour++;
-                        if (hour == 12) {
-                        	if ("AM".equals(AmPm)) {
-                                AmPm = "PM";
-                            } else {
-                                AmPm = "AM";
-                            }
-                        } else if (hour == 13) {
-                            hour = 1;
-                        }
-                    }
-                    //set new time
-                    if (minutes == 0) {
-                        time = hour + ":00 " + AmPm;
-                    } else {
-                        time = hour + ":" + minutes + " " + AmPm;
-                    }
-                } //end flag if
+				    //convert lines to Match objects
+				    if (flag) {
+				        lineToMatch(line, time);
+				        //increment time
+				        minutes += 5;
+				        if (minutes == 60) {
+				            minutes = 0;
+				            hour++;
+				            if (hour == 12) {
+				            	if ("AM".equals(AmPm)) {
+				                    AmPm = "PM";
+				                } else {
+				                    AmPm = "AM";
+				                }
+				            } else if (hour == 13) {
+				                hour = 1;
+				            }
+				        }
+				        //set new time
+				        if (minutes == 0) {
+				            time = hour + ":00 " + AmPm;
+				        } else {
+				            time = hour + ":" + minutes + " " + AmPm;
+				        }
+				    } //end flag if
 
-                lastLine = line;
+				    lastLine = line;
 
-            } //end while loop
+				} //end while loop
+			}
         } catch (FileNotFoundException e) {
-            System.out.println("An error occured.");
-            e.printStackTrace();
+            //System.out.println("An error occured.");
+            //e.printStackTrace();
+        	throw e;
         }
 
         //write match array to json file

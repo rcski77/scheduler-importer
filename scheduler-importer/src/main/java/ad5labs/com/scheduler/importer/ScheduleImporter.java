@@ -8,32 +8,47 @@
  */
 package ad5labs.com.scheduler.importer;
 
-import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Module to import an excel file with a tournament schedule Turn into readable
- * object for ref-scheduler project
- * Currently only works for a single day schedule, need to add date functionality
- * Schedule also must start at 8am or times will not be correct in JSON
+ * object for ref-scheduler project Currently only works for a single day
+ * schedule, need to add date functionality Schedule also must start at 8am or
+ * times will not be correct in JSON
  */
 public class ScheduleImporter {
 
-    public static void main(String[] args) throws IOException {
-    	
-    	//set read and save file paths
-        String readPath = "./working-files/scheduleimport.xlsx";
-        String savePath = "./working-files/schedule.txt";
-        
-        //read excel schedule report and turn into a .txt file
-        Map<Integer, List<String>> schedule = ScheduleRead.openExcel(readPath);
-        ScheduleRead.writeMaptoFile(schedule, savePath + "\b");
-        
-        //read text file created previously and write data to json file
-        TxtToJSON.readFile(savePath);
-        
-    }
+	public static void main(String[] args) throws IOException {
+
+		// run entire import to json file workload
+		runImport("./working-files/scheduleimport.xlsx", "./working-files/schedule.txt");
+	}
+
+	public static void runImport(String readPath, String savePath) {
+
+		// read excel schedule report and turn into a .txt file
+		Map<Integer, List<String>> schedule = null;
+
+		try {
+			schedule = ScheduleRead.openExcel(readPath);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		ScheduleRead.writeMaptoFile(schedule, savePath);
+
+		// read text file created previously and write data to json file
+		try {
+			TxtToJSON.readFile(savePath);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 
 }
