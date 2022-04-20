@@ -10,66 +10,73 @@ class ScheduleReadTest {
 
 	@Test
 	void test() throws FileNotFoundException, IOException {
-		
-		//test creating ScheduleRead obj from class
+
+		// test creating ScheduleRead obj from class
 		ScheduleRead scheduleObj = new ScheduleRead();
 		assertNotNull(scheduleObj);
-		
-		//set files to read and write
+
+		// set files to read and write
 		String readPath = "./working-files/test.xlsx";
-        String savePath = "./working-files/test.txt";
-        String readFail = "./working-files/fake.xlsx";
-        String saveFail = "./working-files/*.txt";
-        
-        //catch file not found exception
-        try {
-        	ScheduleRead.openExcel(readFail);
-        	fail("Exception not thrown");
-        }
-        catch (Exception e) {
-        	assertNotNull(e);
-        }
-        
-      //catch file not found exception with escaped character
-        try {
-        	ScheduleRead.openExcel(readPath + "\b");
-        	fail("Exception not thrown");
-        }
-        catch (Exception e) {
-        	assertNotNull(e);
-        }
-        
-        //create map from excel file
-        Map schedule = ScheduleRead.openExcel(readPath);
-        
-        //Check that Map schedule is created
-        assertNotNull(schedule);
-        //Check value at index 2 is correct
-        assertEquals(schedule.get(2).toString(),"[12 Girls, 7]");
-        
-        //Check that numbers row in test.xlsx is parsed to strings correctly
-        assertEquals(((ArrayList) schedule.get(31)).get(1), "1.0");
-        //Assert object at index 31 is a valid ArrayList
-        assertTrue(schedule.get(31) instanceof java.util.ArrayList);
-        
-        //test writing created map to a txt file
-        ScheduleRead.writeMaptoFile(schedule, savePath);
-        
-        //use illegal characters in file name
-        try {
-        	ScheduleRead.writeMaptoFile(schedule, saveFail);
-        }
-        catch (Exception e) {
-        	System.out.println(e);
-        }
-        
-      //use escaped characters in file name
-        try {
-        	ScheduleRead.writeMaptoFile(schedule, savePath + "\b");
-        }
-        catch (Exception e) {
-        	System.out.println(e);
-        }
+		String savePath = "./working-files/test.txt";
+		String readFail = "./working-files/fake.xlsx";
+		String saveFail = "./working-files/*.txt";
+
+		// catch file not found exception
+		try {
+			ScheduleRead.openExcel(readFail);
+			fail("Exception not thrown");
+		} catch (Exception e) {
+			assertNotNull(e);
+		}
+
+		// catch file not found exception with escaped character
+		try {
+			ScheduleRead.openExcel(readPath + "\b");
+			fail("Exception not thrown");
+		} catch (Exception e) {
+			assertNotNull(e);
+		}
+
+		// catch file not found exception with invalid character
+		try {
+			ScheduleRead.openExcel(readPath + "*$");
+			fail("Exception not thrown");
+		} catch (Exception e) {
+			assertNotNull(e);
+		}
+
+		// create map from excel file with valid file name
+		Map schedule = ScheduleRead.openExcel(readPath);
+
+		// Check that Map schedule is created
+		assertNotNull(schedule);
+		// Check value at index 2 is correct
+		assertEquals(schedule.get(2).toString(), "[12 Girls, 7]");
+
+		// Check that numbers row in test.xlsx is parsed to strings correctly
+		assertEquals(((ArrayList) schedule.get(31)).get(1), "1.0");
+		// Assert object at index 31 is a valid ArrayList
+		assertTrue(schedule.get(31) instanceof java.util.ArrayList);
+
+		// test writing created map to a txt file with valid file name
+		ScheduleRead.writeMaptoFile(schedule, savePath);
+
+		// test writeMaptoFile method
+		// use illegal characters in file name
+		try {
+			ScheduleRead.writeMaptoFile(schedule, savePath + "*$");
+			fail("Error not caught.");
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+
+		// use escaped characters in file name
+		try {
+			ScheduleRead.writeMaptoFile(schedule, savePath + "\b");
+			fail("Error not caught.");
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 	}
 
 }

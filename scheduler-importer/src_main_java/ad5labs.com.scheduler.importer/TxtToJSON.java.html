@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>TxtToJSON.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">JUnitTestSuite (Apr 20, 2022 4:48:02 PM)</a> &gt; <a href="../../index.html" class="el_group">scheduler-importer</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">ad5labs.com.scheduler.importer</a> &gt; <span class="el_source">TxtToJSON.java</span></div><h1>TxtToJSON.java</h1><pre class="source lang-java linenums">/*
+* Programmer	: Adam Rykse
+* Language	: Java
+* Purpose	: Import and parse an excel file with tournament schedule
+* Assignment	: Software Testing Project
+* Date		: April 15, 2022
+* Course	: CIS 613
+ */
+package ad5labs.com.scheduler.importer;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
+import org.json.simple.JSONArray;
+
+/**
+ * Module to take a .txt file that was created from ScheduleRead class
+ * and make data into a JSON file
+ */
+<span class="fc" id="L25">public class TxtToJSON {</span>
+
+<span class="fc" id="L27">    private static final JSONArray matchArray = new JSONArray(); //initialize array for JSON objects</span>
+<span class="fc" id="L28">    private static final List&lt;String&gt; courtNum = new ArrayList&lt;String&gt;();</span>
+
+    public static void readFile(String filePath) throws IOException {
+<span class="fc" id="L31">        int hour = 8;</span>
+<span class="fc" id="L32">        int minutes = 0;</span>
+<span class="fc" id="L33">        String AmPm = &quot;AM&quot;;</span>
+<span class="fc" id="L34">        String time = hour + &quot;:00 &quot; + AmPm;</span>
+<span class="fc" id="L35">        boolean flag = false; //flag to start parsing lines</span>
+
+        try {
+<span class="fc" id="L38">            File file = new File(filePath);</span>
+<span class="fc" id="L39">            try (Scanner scanner = new Scanner(file)) {</span>
+<span class="fc" id="L40">				String lastLine = &quot;&quot;;</span>
+				
+<span class="fc bfc" id="L42" title="All 2 branches covered.">				while (scanner.hasNextLine()) {</span>
+<span class="fc" id="L43">				    String line = scanner.nextLine();</span>
+
+				    //find first relevant line in file
+<span class="fc bfc" id="L46" title="All 2 branches covered.">				    if (line.matches(&quot;.*8:00 AM.*&quot;)) {</span>
+<span class="fc" id="L47">				        flag = true;</span>
+<span class="fc" id="L48">				        courtLine(lastLine);</span>
+				    }
+
+				    //convert lines to Match objects
+<span class="fc bfc" id="L52" title="All 2 branches covered.">				    if (flag) {</span>
+<span class="fc" id="L53">				        lineToMatch(line, time);</span>
+				        //increment time
+<span class="fc" id="L55">				        minutes += 5;</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">				        if (minutes == 60) {</span>
+<span class="fc" id="L57">				            minutes = 0;</span>
+<span class="fc" id="L58">				            hour++;</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">				            if (hour == 12) {</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">				            	if (&quot;AM&quot;.equals(AmPm)) {</span>
+<span class="fc" id="L61">				                    AmPm = &quot;PM&quot;;</span>
+<span class="fc" id="L62">				                } else {</span>
+<span class="fc" id="L63">				                    AmPm = &quot;AM&quot;;</span>
+				                }
+<span class="fc bfc" id="L65" title="All 2 branches covered.">				            } else if (hour == 13) {</span>
+<span class="fc" id="L66">				                hour = 1;</span>
+				            }
+				        }
+				        //set new time
+<span class="fc bfc" id="L70" title="All 2 branches covered.">				        if (minutes == 0) {</span>
+<span class="fc" id="L71">				            time = hour + &quot;:00 &quot; + AmPm;</span>
+<span class="fc" id="L72">				        } else {</span>
+<span class="fc" id="L73">				            time = hour + &quot;:&quot; + minutes + &quot; &quot; + AmPm;</span>
+				        }
+				    } //end flag if
+
+<span class="fc" id="L77">				    lastLine = line;</span>
+
+				} //end while loop
+			}
+<span class="fc" id="L81">        } catch (FileNotFoundException e) {</span>
+            //System.out.println(&quot;An error occured.&quot;);
+            //e.printStackTrace();
+<span class="fc" id="L84">        	throw e;</span>
+        }
+
+        //write match array to json file
+<span class="fc" id="L88">        arrayToFile(filePath);</span>
+
+<span class="fc" id="L90">    } // end readFile method</span>
+
+    private static void lineToMatch(String line, String time) {
+<span class="fc" id="L93">        String delimiter = &quot;,&quot;;</span>
+<span class="fc" id="L94">        String roundPattern = &quot;R[0-9].+M[0-9]{1,3}&quot;;</span>
+<span class="fc" id="L95">        line = line.replace(&quot;]&quot;, &quot;&quot;);</span>
+
+        //turn each line into a list of games
+<span class="fc" id="L98">        List&lt;String&gt; result = Arrays.asList(line.split(delimiter));</span>
+
+        //go through each line to turn each game into a Match object
+<span class="fc bfc" id="L101" title="All 2 branches covered.">        for (int i = 1; i &lt; result.size(); i++) {</span>
+            //check if string is empty
+<span class="fc bfc" id="L103" title="All 2 branches covered.">            if (result.get(i).matches(&quot;\s+&quot;) == false) {</span>
+                //add commas around round code
+<span class="fc" id="L105">                String eachGame = result.get(i).replaceAll(roundPattern, &quot;,$0,&quot;);</span>
+                //separate line into array based on comma delimiter
+<span class="fc" id="L107">                List&lt;String&gt; eachGameList = Arrays.asList(eachGame.split(delimiter));</span>
+                
+                //remove white space around division label
+<span class="fc" id="L110">                eachGameList.set(0, eachGameList.get(0).stripLeading());</span>
+<span class="fc" id="L111">                eachGameList.set(0, eachGameList.get(0).stripTrailing());</span>
+
+                //trim match code to just numbers
+<span class="fc" id="L114">                eachGameList.set(2, eachGameList.get(2).replaceAll(&quot;\\(MC:&quot;, &quot;&quot;));</span>
+<span class="fc" id="L115">                eachGameList.set(2, eachGameList.get(2).replaceAll(&quot;\\)&quot;, &quot;&quot;));</span>
+<span class="fc" id="L116">                eachGameList.set(2, eachGameList.get(2).replaceAll(&quot; &quot;, &quot;&quot;));</span>
+
+                //turn game info into Match object
+<span class="fc" id="L119">                Match match = new Match(time, courtNum.get(i - 1), eachGameList.get(0), eachGameList.get(1), Integer.valueOf(eachGameList.get(2)));</span>
+<span class="fc" id="L120">                matchArray.add(match); //add match to JSON array</span>
+            }
+        }
+<span class="fc" id="L123">    } //end lineToMatch method</span>
+    
+    //reads line of court labels and creats an arraylist containing values
+    private static void courtLine(String line) {
+<span class="fc" id="L127">        String delimiter = &quot;,&quot;;</span>
+<span class="fc" id="L128">        line = line.replace(&quot;]&quot;, &quot;&quot;);</span>
+<span class="fc" id="L129">        List&lt;String&gt; result = Arrays.asList(line.split(delimiter));</span>
+        
+<span class="fc bfc" id="L131" title="All 2 branches covered.">        for (int i = 1; i &lt; result.size(); i++) { //iterate through list, skipping first entry</span>
+<span class="fc" id="L132">            result.set(i, result.get(i).stripLeading()); //remove leading white space</span>
+<span class="fc" id="L133">            courtNum.add(result.get(i)); //add each item to courtNum list</span>
+        }
+<span class="fc" id="L135">    } //end courtLine method</span>
+
+    //writes matchArray JSONArray to a json file at path
+    private static void arrayToFile(String path) throws IOException {
+<span class="fc" id="L139">        try (FileWriter writer = new FileWriter(&quot;./%s.json&quot;.formatted(path))) {</span>
+            //write match JSONArray to json file
+<span class="fc" id="L141">            writer.write(matchArray.toJSONString());</span>
+<span class="fc" id="L142">            writer.flush();</span>
+        }
+<span class="fc" id="L144">    } //end arrayToFile method</span>
+} //end class
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span>JUnitTestSuite (Apr 20, 2022 4:48:02 PM)</div></body></html>

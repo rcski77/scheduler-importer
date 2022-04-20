@@ -39,7 +39,11 @@ public class ScheduleImporter {
 			e1.printStackTrace();
 		}
 
-		ScheduleRead.writeMaptoFile(schedule, savePath);
+		try {
+			ScheduleRead.writeMaptoFile(schedule, savePath);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 
 		// read text file created previously and write data to json file
 		try {

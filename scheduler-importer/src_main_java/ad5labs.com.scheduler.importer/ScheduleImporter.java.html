@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>ScheduleImporter.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">JUnitTestSuite (Apr 20, 2022 4:48:02 PM)</a> &gt; <a href="../../index.html" class="el_group">scheduler-importer</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">ad5labs.com.scheduler.importer</a> &gt; <span class="el_source">ScheduleImporter.java</span></div><h1>ScheduleImporter.java</h1><pre class="source lang-java linenums">/*
+* Programmer	: Adam Rykse
+* Language	: Java
+* Purpose	: Import and parse an excel file with tournament schedule
+* Assignment	: Software Testing Project
+* Date		: April 15, 2022
+* Course	: CIS 613
+ */
+package ad5labs.com.scheduler.importer;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Module to import an excel file with a tournament schedule Turn into readable
+ * object for ref-scheduler project Currently only works for a single day
+ * schedule, need to add date functionality Schedule also must start at 8am or
+ * times will not be correct in JSON
+ */
+<span class="fc" id="L22">public class ScheduleImporter {</span>
+
+	public static void main(String[] args) throws IOException {
+
+		// run entire import to json file workload
+<span class="fc" id="L27">		runImport(&quot;./working-files/scheduleimport.xlsx&quot;, &quot;./working-files/schedule.txt&quot;);</span>
+<span class="fc" id="L28">	}</span>
+
+	public static void runImport(String readPath, String savePath) {
+
+		// read excel schedule report and turn into a .txt file
+<span class="fc" id="L33">		Map&lt;Integer, List&lt;String&gt;&gt; schedule = null;</span>
+
+		try {
+<span class="fc" id="L36">			schedule = ScheduleRead.openExcel(readPath);</span>
+<span class="fc" id="L37">		} catch (IOException e1) {</span>
+			// TODO Auto-generated catch block
+<span class="fc" id="L39">			e1.printStackTrace();</span>
+		}
+
+		try {
+<span class="fc" id="L43">			ScheduleRead.writeMaptoFile(schedule, savePath);</span>
+<span class="pc" id="L44">		} catch (IOException e1) {</span>
+<span class="nc" id="L45">			e1.printStackTrace();</span>
+		}
+
+		// read text file created previously and write data to json file
+		try {
+<span class="fc" id="L50">			TxtToJSON.readFile(savePath);</span>
+<span class="pc" id="L51">		} catch (IOException e) {</span>
+			// TODO Auto-generated catch block
+<span class="nc" id="L53">			e.printStackTrace();</span>
+		}
+
+<span class="fc" id="L56">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span>JUnitTestSuite (Apr 20, 2022 4:48:02 PM)</div></body></html>

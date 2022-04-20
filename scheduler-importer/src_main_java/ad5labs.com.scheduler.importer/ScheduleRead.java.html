@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>ScheduleRead.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">JUnitTestSuite (Apr 20, 2022 4:48:02 PM)</a> &gt; <a href="../../index.html" class="el_group">scheduler-importer</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">ad5labs.com.scheduler.importer</a> &gt; <span class="el_source">ScheduleRead.java</span></div><h1>ScheduleRead.java</h1><pre class="source lang-java linenums">/*
+* Programmer	: Adam Rykse
+* Language	: Java
+* Purpose	: Import and parse an excel file with tournament schedule
+* Assignment	: Software Testing Project
+* Date		: April 15, 2022
+* Course	: CIS 613
+ */
+package ad5labs.com.scheduler.importer;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+/**
+ * Module to import an excel file with a tournament schedule 
+ * and Turn into readable object for ref-scheduler project
+ */
+<span class="fc" id="L32">public class ScheduleRead {</span>
+    
+     public static Map openExcel(String fileLocation) throws FileNotFoundException, IOException {
+<span class="fc" id="L35">        FileInputStream file = new FileInputStream(new File(fileLocation));</span>
+<span class="fc" id="L36">        Workbook workbook = new XSSFWorkbook(file);</span>
+
+<span class="fc" id="L38">        Sheet sheet = workbook.getSheetAt(0);</span>
+<span class="fc" id="L39">        Map&lt;Integer, List&lt;String&gt;&gt; data = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L40">        int i = 0;</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        for (Row row : sheet) {</span>
+<span class="fc" id="L42">            data.put(i, new ArrayList&lt;&gt;());</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">            for (Cell cell : row) {</span>
+<span class="fc bfc" id="L44" title="All 5 branches covered.">                switch (cell.getCellType()) {</span>
+                    case STRING:
+<span class="fc" id="L46">                        data.get(i).add(cell.getRichStringCellValue().getString());</span>
+<span class="fc" id="L47">                        break;</span>
+                    case NUMERIC:
+<span class="fc bfc" id="L49" title="All 2 branches covered.">                        if (DateUtil.isCellDateFormatted(cell)) {</span>
+<span class="fc" id="L50">                            data.get(i).add(cell.getDateCellValue() + &quot;&quot;);</span>
+<span class="fc" id="L51">                        } else {</span>
+<span class="fc" id="L52">                            data.get(i).add(cell.getNumericCellValue() + &quot;&quot;);</span>
+                        }
+<span class="fc" id="L54">                        break;</span>
+                    case BOOLEAN:
+<span class="fc" id="L56">                        data.get(i).add(cell.getBooleanCellValue() + &quot;&quot;);</span>
+<span class="fc" id="L57">                        break;</span>
+                    case FORMULA:
+<span class="fc" id="L59">                        data.get(i).add(cell.getCellFormula() + &quot;&quot;);</span>
+<span class="fc" id="L60">                        break;</span>
+                    default:
+<span class="fc" id="L62">                        data.get(new Integer(i)).add(&quot; &quot;);</span>
+                }
+            }
+<span class="fc" id="L65">            i++;</span>
+        } //end for Loop
+<span class="fc" id="L67">        return data;</span>
+    } //end openExcel method
+    
+    public static void writeMaptoFile(Map&lt;Integer, List&lt;String&gt;&gt; map, String outputPath) throws IOException {
+<span class="fc" id="L71">        File file = new File(outputPath);</span>
+<span class="fc" id="L72">        BufferedWriter bf = null;</span>
+        
+        try {
+            //create new buffered writer
+<span class="fc" id="L76">            bf = new BufferedWriter(new FileWriter(file));</span>
+            
+            //iterate through map
+<span class="fc bfc" id="L79" title="All 2 branches covered.">            for (Map.Entry&lt;Integer, List&lt;String&gt;&gt; entry : map.entrySet()) {</span>
+<span class="fc" id="L80">                bf.write(entry.getKey() + &quot;:&quot; + entry.getValue());</span>
+                
+                //new line
+<span class="fc" id="L83">                bf.newLine();</span>
+            }
+            //close writer
+<span class="fc" id="L86">            bf.flush();</span>
+<span class="fc" id="L87">        }</span>
+<span class="fc" id="L88">        catch (IOException e) {</span>
+            //e.printStackTrace();
+<span class="fc" id="L90">        	throw e;</span>
+        }
+        finally {
+            try {
+<span class="fc" id="L94">                bf.close();</span>
+<span class="fc" id="L95">            }</span>
+<span class="fc" id="L96">            catch (Exception e) {</span>
+                //catch here
+<span class="fc" id="L98">            	throw e;</span>
+            }
+        }
+<span class="fc" id="L101">    } //end writeMaptoFile method</span>
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span>JUnitTestSuite (Apr 20, 2022 4:48:02 PM)</div></body></html>

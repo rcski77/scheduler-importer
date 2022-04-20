@@ -67,7 +67,7 @@ public class ScheduleRead {
         return data;
     } //end openExcel method
     
-    public static void writeMaptoFile(Map<Integer, List<String>> map, String outputPath) {
+    public static void writeMaptoFile(Map<Integer, List<String>> map, String outputPath) throws IOException {
         File file = new File(outputPath);
         BufferedWriter bf = null;
         
@@ -86,7 +86,8 @@ public class ScheduleRead {
             bf.flush();
         }
         catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+        	throw e;
         }
         finally {
             try {
@@ -94,6 +95,7 @@ public class ScheduleRead {
             }
             catch (Exception e) {
                 //catch here
+            	throw e;
             }
         }
     } //end writeMaptoFile method
