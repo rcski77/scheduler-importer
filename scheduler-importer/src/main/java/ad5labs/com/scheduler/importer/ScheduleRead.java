@@ -35,6 +35,7 @@ public class ScheduleRead {
         FileInputStream file = new FileInputStream(new File(fileLocation));
         Workbook workbook = new XSSFWorkbook(file);
 
+        // excel reading process found at https://www.baeldung.com/java-microsoft-excel
         Sheet sheet = workbook.getSheetAt(0);
         Map<Integer, List<String>> data = new HashMap<>();
         int i = 0;
@@ -59,7 +60,7 @@ public class ScheduleRead {
                         data.get(i).add(cell.getCellFormula() + "");
                         break;
                     default:
-                        data.get(new Integer(i)).add(" ");
+                        data.get(i).add(" ");
                 }
             }
             i++;
